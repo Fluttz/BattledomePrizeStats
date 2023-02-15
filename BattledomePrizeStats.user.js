@@ -38,7 +38,7 @@ function displayTotals() {
         return;
     }
     //Grab stored info. If it's a new day, reset everything.
-    var d = new Date(new Date().toLocaleString("en-US", {timeZone: "PST"}));
+    var d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
     var currentDate = d.getDate();
     var storedDate = window.localStorage.getItem('battledomeDate');
     var nPCount = window.localStorage.getItem('battledomeNPCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeNPCount'));

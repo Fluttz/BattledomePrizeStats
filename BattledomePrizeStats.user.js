@@ -19,19 +19,18 @@ function displayTotals() {
     var OUTPUTREWARDS = false;
 
     //Add items that are worth a lot to this list to make them increase the $$$ counter
-    var moneyPrizes = ["Nerkmid","Bubbling Fungus"];
+    var moneyPrizes = ["Nerkmid","Bubbling Fungus","Frozen Negg"];
 
     //Don't modify anything below this unless you know what you're doing
 
 
 
-    //Clear the record if set to clear
+
     if (PURGERECORD){
         console.log("RECORD HAS BEEN PURGED!");
         purgeAll();
     }
 
-    //Mostly OG Battledome Prize Counter code
     let rewardsBox = document.getElementById("bd_rewards");
     //In case of double click
     if (rewardsBox.children[1].children.length > 0) {
@@ -44,7 +43,7 @@ function displayTotals() {
     var nPCount = window.localStorage.getItem('battledomeNPCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeNPCount'));
     var itemCount = window.localStorage.getItem('battledomeItemCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeItemCount'));
     var nerkCount = window.localStorage.getItem('battledomeNerkCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeNerkCount'));
-    //Added for counting valuable items like nerks or fungus
+    //For counting valuable items like nerks or fungus
     if (storedDate != currentDate) {
         nPCount = 0;
         itemCount = 0;
@@ -56,15 +55,26 @@ function displayTotals() {
     }
     //Add any winnings and store the new totals
     let prizes = document.querySelectorAll("#bd_rewardsloot .prizname");
+
+    //Look for duplicates bug
+    let dupes = document.querySelectorAll("#bd_rewardsloot");
+    dupes = (dupes[0].innerHTML.match(/<\/td><\/tr>/g) || []).length;
+
+
+    var prizenum = prizes.length;
+    if (dupes > 1){
+        prizenum = prizes.length/2;
+    }
+
     var npswon = false;
     if (prizes.length > 0) {
-        for (let i = 0; i < prizes.length; i++) {
+        for (let i = 0; i < prizenum; i++) {
             if (/\d+ Neopoints/.test(prizes[i].textContent)) {
                 npswon = true;
                 let np = prizes[i].textContent.split(' ')[0];
                 nPCount += parseInt(np);
             } else {
-                //Check if item is valuable
+                //check if item is valuable
                 let itemName = prizes[i].textContent;
                 for (let j = 0; j < moneyPrizes.length;j++){
                     if (itemName.indexOf(moneyPrizes[j])>-1){
@@ -73,7 +83,7 @@ function displayTotals() {
                     }
                 }
                 itemCount += 1;
-                //Save item to permanent record
+                //save item to record
                 if (npswon){
                     appendDump(i,prizes[i].textContent);
                 } else {
@@ -97,23 +107,23 @@ function displayTotals() {
     separator.setAttribute("style", "font-weight: normal;");
     let np = document.createElement("strong");
     np.textContent = 'NP: ' + nPCount;
-    rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks);
-    
-    //Post record to console if set to do so
+    if (dupes > 1){
+        let dupewarn = document.createElement("strong");
+        dupewarn.innerHTML = '<br>DUPLICATE PRIZE BUG DETECTED';
+        rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks).appendChild(dupewarn);
+    } else {
+        rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks);
+    }
     if (OUTPUTREWARDS){
-    console.log("Prizes Dump: "+window.localStorage.getItem('prizeDump'));
+    console.log(window.localStorage.getItem('prizeDump').trim());
     }
 }
 
 function appendDump(prizeNum, prizeName){
-    //Pull enemy name
     var enemyName = document.getElementById("p2name");
     enemyName = enemyName.textContent;
-    
-    //Messy spaghetti to extract the original enemy HP from the scripts on the page
     var hpScr = document.getElementsByTagName("script");
     var scrID = -1;
-    //Find which script contains enemy HP
     for (let i = 0; i<hpScr.length;i++){
     let tester = hpScr[i].textContent;
         if (tester.indexOf("#p2hp")>-1){
@@ -121,7 +131,6 @@ function appendDump(prizeNum, prizeName){
             break;
         }
     }
-    //Extract enemy HP from the script
     hpScr=hpScr[scrID].textContent;
     var HPid = hpScr.indexOf("#p2hp");
     var enemyHP=-1
@@ -129,12 +138,9 @@ function appendDump(prizeNum, prizeName){
         enemyHP=hpScr.substring(HPid+14,HPid+30);
         enemyHP=enemyHP.substring(0,enemyHP.indexOf("'"));
     }
-    //Retrieve permanent record
     var record = window.localStorage.getItem('prizeDump');
-    //Append permanent record
     var extra = enemyName + "," + enemyHP + "," + prizeNum + "," + prizeName;
     record = record + "\n" + extra;
-    //Save permanent record
     window.localStorage.setItem('prizeDump', record);
 }
 

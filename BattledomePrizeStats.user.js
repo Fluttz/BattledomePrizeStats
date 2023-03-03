@@ -61,12 +61,18 @@ function displayTotals() {
     dupes = (dupes[0].innerHTML.match(/<\/td><\/tr>/g) || []).length;
 
 
+    var npswon = false;
+
+    //Adjust number of prizes to read based on duplicates found
     var prizenum = prizes.length;
     if (dupes > 1){
-        prizenum = prizes.length/2;
+        if (prizenum%2==0){
+            prizenum = prizes.length/2;
+        } else {
+            prizenum = (prizes.length+1)/2;
+        }
     }
 
-    var npswon = false;
     if (prizes.length > 0) {
         for (let i = 0; i < prizenum; i++) {
             if (/\d+ Neopoints/.test(prizes[i].textContent)) {

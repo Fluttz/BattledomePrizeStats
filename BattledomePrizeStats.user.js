@@ -16,7 +16,7 @@ function displayTotals() {
     var PURGERECORD = false;
 
     //Change OUTPUTREWARDS to true to output collected data to console when you collect your reward
-    var OUTPUTREWARDS = false;
+    var OUTPUTREWARDS = true;
 
     //Add items that are worth a lot to this list to make them increase the $$$ counter
     var moneyPrizes = ["Nerkmid","Bubbling Fungus","Frozen Negg"];
@@ -121,7 +121,23 @@ function displayTotals() {
         rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks);
     }
     if (OUTPUTREWARDS){
-    console.log(window.localStorage.getItem('prizeDump').trim());
+        let mainOut = window.localStorage.getItem('prizeDump').trim().split("\n");
+        let spaceOut = "";
+        let frostOut = "";
+        let otherOut = "";
+        for (let i = 0; i < mainOut.length; i++){
+            if ((mainOut[i].includes("Giant Space Fungus"))||(mainOut[i].includes("Jetsam Ace"))){
+                spaceOut = spaceOut + "\n" + mainOut[i];
+            } else if ((mainOut[i].includes("Donny"))||(mainOut[i].includes("Lady Frostbite"))||(mainOut[i].includes("Snow Beast"))||(mainOut[i].includes("Snow Faerie"))||(mainOut[i].includes("The Snowager"))||(mainOut[i].includes("Valin"))){
+                frostOut = frostOut + "\n" + mainOut[i];
+            } else {
+                otherOut = otherOut + "\n" + mainOut[i];
+            }
+        }
+
+        console.log(spaceOut.trim());
+        console.log(frostOut.trim());
+        console.log(otherOut.trim());
     }
 }
 

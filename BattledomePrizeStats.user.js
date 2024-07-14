@@ -36,6 +36,7 @@ function displayTotals() {
     if (rewardsBox.children[1].children.length > 0) {
         return;
     }
+    console.log(rewardsBox.textContent);
     //Grab stored info. If it's a new day, reset everything.
     var d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
     var currentDate = d.getDate();
@@ -43,6 +44,8 @@ function displayTotals() {
     var nPCount = window.localStorage.getItem('battledomeNPCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeNPCount'));
     var itemCount = window.localStorage.getItem('battledomeItemCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeItemCount'));
     var nerkCount = window.localStorage.getItem('battledomeNerkCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomeNerkCount'));
+
+    var plotCount = window.localStorage.getItem('battledomeNerkCount') == null ? 0 : parseInt(window.localStorage.getItem('battledomePlotCount'));
     //For counting valuable items like nerks or fungus
     if (storedDate != currentDate) {
         nPCount = 0;
@@ -52,6 +55,9 @@ function displayTotals() {
         window.localStorage.setItem('battledomeItemCount', itemCount);
         window.localStorage.setItem('battledomeNerkCount', nerkCount);
         window.localStorage.setItem('battledomeDate', currentDate);
+
+        plotCount = 0;
+        window.localStorage.setItem('battledomePlotCount', plotCount);
     }
     //Add any winnings and store the new totals
     let prizes = document.querySelectorAll("#bd_rewardsloot .prizname");
@@ -101,6 +107,14 @@ function displayTotals() {
         window.localStorage.setItem('battledomeItemCount', itemCount);
         window.localStorage.setItem('battledomeNerkCount', nerkCount);
     }
+    if (rewardsBox.textContent.includes("Plot Points")){
+        if (!rewardsBox.textContent.includes("You have reached the Plot Points limit for today!")){
+            let plotString = rewardsBox.textContent.substring(rewardsBox.textContent.indexOf("been rewarded")+14);
+            plotString = plotString.substring(0,plotString.indexOf(" "));
+            plotCount = plotCount + Number(plotString);
+            window.localStorage.setItem('battledomePlotCount', plotCount);
+        }
+    }
     //Display the totals
     let counter = document.createElement("span");
     counter.setAttribute("nowrap", "nowrap", "nowrap");
@@ -108,6 +122,8 @@ function displayTotals() {
     items.textContent = ' Items: ' + itemCount;
     let nerks = document.createElement("strong");
     nerks.textContent = ' | $$$: ' + nerkCount;
+    let plots = document.createElement("strong");
+    plots.textContent = ' | Plot Points: ' + plotCount;
     let separator = document.createElement("span");
     separator.textContent = ' | ';
     separator.setAttribute("style", "font-weight: normal;");
@@ -116,9 +132,9 @@ function displayTotals() {
     if (dupes > 1){
         let dupewarn = document.createElement("strong");
         dupewarn.innerHTML = '<br>DUPLICATE PRIZE BUG DETECTED';
-        rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks).appendChild(dupewarn);
+        rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks).appendChild(plots).appendChild(dupewarn);
     } else {
-        rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks);
+        rewardsBox.children[1].appendChild(counter).appendChild(np).appendChild(separator).appendChild(items).appendChild(nerks).appendChild(plots);
     }
     if (OUTPUTREWARDS){
         let mainOut = window.localStorage.getItem('prizeDump').trim().split("\n");
